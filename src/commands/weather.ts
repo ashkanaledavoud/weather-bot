@@ -1,6 +1,4 @@
-import { SlashCommandBuilder, SlashCommandStringOption, EmbedBuilder } from 'discord.js';
-import { ChatInputCommandInteraction } from 'discord.js/typings';
-
+import { SlashCommandBuilder, SlashCommandStringOption, EmbedBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { fetchWeather } from '../requests/fetchWeather.ts';
 
 const weatherData = new SlashCommandBuilder()
@@ -33,33 +31,33 @@ const executeWeatherCommand = async (interaction: ChatInputCommandInteraction): 
     const { weatherData, locationName } = await fetchWeather(location);
 
     try {
-        const embed = new EmbedBuilder()
-            .setColor(0x6D8196)
-            .setTitle(`Current Weather for ${locationName}:`)
-            .setDescription(`Using the ${units} system.`)
-            .setTimestamp()
-            .setFooter({ text: 'Powered by weatherapi.com API', 
-             });
-
         const currTemp = isImperial ? weatherData.tempF : weatherData.tempC;
         const currWind = isImperial ? weatherData.windMph : weatherData.windKph;
         const windUnit = isImperial ? 'mph' : 'kph';
 
         const date = new Date(weatherData.localtime);
-        const formattedTime = `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getFullYear()} ${(date.getHours()).toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        const formattedTime = `${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-${date.getUTCDate().toString().padStart(2, '0')}-${date.getUTCFullYear()} ${(date.getUTCHours()).toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}`;
+        const conditionIconUrl = weatherData.conditionIcon.startsWith('//') ? `https:${weatherData.conditionIcon}` : weatherData.conditionIcon;
 
         const fields: any = {
             name: formattedTime,
             value: 
             `
                 Condition: ${weatherData.conditionText}\n
-                Temperature: ${currTemp}°\n
-                Humidity: ${weatherData.humidity}%\n
-                Wind: ${currWind} ${windUnit}\n
+                🌡️ Temperature: ${currTemp}°\n
+                💧 Humidity: ${weatherData.humidity}%\n
+                🌬️ Wind: ${currWind} ${windUnit}\n
             `,
         };
 
-        embed.addFields(fields);
+        const embed = new EmbedBuilder()
+            .setColor(0x6D8196)
+            .setTitle(`Current Weather for ${locationName}`)
+            .setThumbnail(conditionIconUrl)
+            .setTimestamp()
+            .setFooter({ text: 'Powered by weatherapi.com API'})
+            .addFields(fields);
+
 
         await interaction.editReply({ embeds: [embed] } as any);
     } catch (error) {

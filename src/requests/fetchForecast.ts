@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const url = 'https://api.weatherapi.com/v1/forecast.json';
-const forecastDays = 5;
+const forecastDays = 3;
 
 interface ForecastData {
 	date: string;

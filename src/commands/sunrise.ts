@@ -1,6 +1,4 @@
-import { SlashCommandBuilder, SlashCommandStringOption, EmbedBuilder } from 'discord.js';
-import { ChatInputCommandInteraction } from 'discord.js/typings';
-
+import { SlashCommandBuilder, SlashCommandStringOption, EmbedBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { fetchForecast } from '../requests/fetchForecast.ts';
 
 const sunriseData = new SlashCommandBuilder()
@@ -22,18 +20,12 @@ const executesunriseCommand = async (interaction: ChatInputCommandInteraction): 
 	const { weatherData, locationName } = await fetchForecast(location);
 	try {
 
-		const embed = new EmbedBuilder()
-			.setColor(0x6D8196)
-			.setTitle(`Sunrise and Sunset Forecast for ${locationName}:`)
-			.setTimestamp()
-			.setFooter({
-				text: 'Powered by weatherapi.com API.',
-			});
+		const embeds: EmbedBuilder[] = [];
 
 		for (const day of weatherData) {
 
 			const date = new Date(day.date);
-			const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getFullYear()}`;
+			const formattedDate = `${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-${date.getUTCDate().toString().padStart(2, '0')}-${date.getUTCFullYear()}`;
 
 			const fields: any = {
 				name: formattedDate,
@@ -44,9 +36,16 @@ const executesunriseCommand = async (interaction: ChatInputCommandInteraction): 
 					`,
 			};
 
-			embed.addFields(fields);
+			embeds.push(
+				new EmbedBuilder()
+					.setColor(0x6D8196)
+					.setTitle(`Sunrise and Sunset Forecast for ${locationName}`)
+					.setTimestamp()
+					.setFooter({ text: 'Powered by weatherapi.com API.' })
+					.addFields(fields),
+			);
 		}
-			await interaction.editReply({ embeds: [embed] } as any);
+			await interaction.editReply({ embeds: embeds } as any);
 	} catch (error: Error) {
 		await interaction.editReply(error.message);
 		throw new Error(`Error fetching forecast for ${locationName}`);

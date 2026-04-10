@@ -1,6 +1,4 @@
-import { SlashCommandBuilder, SlashCommandStringOption, EmbedBuilder } from 'discord.js';
-import { ChatInputCommandInteraction } from 'discord.js/typings';
-
+import { SlashCommandBuilder, SlashCommandStringOption, EmbedBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { fetchForecast } from '../requests/fetchForecast.ts';
 
 const forecastData = new SlashCommandBuilder()
@@ -33,14 +31,7 @@ const executeForecastCommand = async (interaction: ChatInputCommandInteraction):
 	const { weatherData, locationName } = await fetchForecast(location);
 	try {
 
-		const embed = new EmbedBuilder()
-			.setColor(0x6D8196)
-			.setTitle(`Weather Forecast for ${locationName}:`)
-			.setDescription(`Using the ${units} system.`)
-			.setTimestamp()
-			.setFooter({
-				text: 'Powered by weatherapi.com API',
-			});
+		const embeds: EmbedBuilder[] = [];
 
 		for (const day of weatherData) {
 			const minTemp = isImperial ? day.tempMinF : day.tempMinC;
@@ -48,24 +39,30 @@ const executeForecastCommand = async (interaction: ChatInputCommandInteraction):
 			const avgTemp = isImperial ? day.tempAvgF : day.tempAvgC;
 
 			const date = new Date(day.date);
-			const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getFullYear()}`;
-
-			// FIXME: This returns a URL string instead of an actual emoji.
-			//const condition_icon = day.conditionIcon.startsWith('//') ? `https:${day.conditionIcon}` : day.conditionIcon;
+			const formattedDate = `${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-${date.getUTCDate().toString().padStart(2, '0')}-${date.getUTCFullYear()}`;
+			const conditionIconUrl = day.conditionIcon.startsWith('//') ? `https:${day.conditionIcon}` : day.conditionIcon;
 
 			const fields: any = {
 				name: formattedDate,
-				value: 
+				value:
 					`
-					Condition: ${day.conditionText}
+					Condition: ${day.conditionText}\n
 					⬇️ Low: ${minTemp}° ⬆️ High: ${maxTemp}° 🌡️ Avg: ${avgTemp}°\n
 					`,
 			};
 
-			embed.addFields(fields);
+			embeds.push(
+				new EmbedBuilder()
+					.setColor(0x6D8196)
+					.setTitle(`Weather Forecast for ${locationName}\n`)
+					.setThumbnail(conditionIconUrl)
+					.setTimestamp()
+					.setFooter({ text: 'Powered by weatherapi.com API' })
+					.addFields(fields),
+			);
 		}
 
-			await interaction.editReply({ embeds: [embed] } as any);
+		await interaction.editReply({ embeds } as any);
 	} catch (error: Error) {
 		await interaction.editReply(error.message);
 		throw new Error(`Error fetching forecast for ${locationName}`);
