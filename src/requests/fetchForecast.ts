@@ -49,7 +49,7 @@ const fetchForecast = async (location: string): Promise<ForecastInfo> => {
 				tempMaxF: forecastDay.day.maxtemp_f,
 				tempAvgC: forecastDay.day.avgtemp_c,
 				tempAvgF: forecastDay.day.avgtemp_f,
-				condition: forecastDay.day.condition.text,
+				conditionText: forecastDay.day.condition.text,
 				conditionIcon: forecastDay.day.condition.icon,
 				sunriseTime: forecastDay.astro.sunrise,
 				sunsetTime: forecastDay.astro.sunset,
