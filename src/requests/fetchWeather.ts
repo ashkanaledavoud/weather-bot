@@ -52,7 +52,7 @@ const fetchWeather = async (location: string): Promise<CurrentInfo> => {
 			weatherData,
 		};
     } catch (error) {
-        console.error('Error fetching forecast:', error);
+        console.error('Error fetching weather:', error);
         return {
             locationName: '',
             weatherData: {

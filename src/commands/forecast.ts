@@ -47,11 +47,14 @@ const executeForecastCommand = async (interaction: ChatInputCommandInteraction):
 			const maxTemp = isImperial ? day.tempMaxF : day.tempMaxC;
 			const avgTemp = isImperial ? day.tempAvgF : day.tempAvgC;
 
+			const date = new Date(day.date);
+			const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getFullYear()}`;
+
 			// FIXME: This returns a URL string instead of an actual emoji.
 			//const condition_icon = day.conditionIcon.startsWith('//') ? `https:${day.conditionIcon}` : day.conditionIcon;
 
 			const fields: any = {
-				name: day.date,
+				name: formattedDate,
 				value: 
 					`
 					Condition: ${day.conditionText}
@@ -62,11 +65,7 @@ const executeForecastCommand = async (interaction: ChatInputCommandInteraction):
 			embed.addFields(fields);
 		}
 
-		await interaction.editReply({
-			embeds: [
-				embed,
-			],
-		} as any);
+			await interaction.editReply({ embeds: [embed] } as any);
 	} catch (error: Error) {
 		await interaction.editReply(error.message);
 		throw new Error(`Error fetching forecast for ${locationName}`);

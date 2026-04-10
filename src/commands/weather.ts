@@ -45,8 +45,11 @@ const executeWeatherCommand = async (interaction: ChatInputCommandInteraction): 
         const currWind = isImperial ? weatherData.windMph : weatherData.windKph;
         const windUnit = isImperial ? 'mph' : 'kph';
 
+        const date = new Date(weatherData.localtime);
+        const formattedTime = `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getFullYear()} ${(date.getHours()).toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+
         const fields: any = {
-            name: weatherData.localtime,
+            name: formattedTime,
             value: 
             `
                 Condition: ${weatherData.conditionText}\n

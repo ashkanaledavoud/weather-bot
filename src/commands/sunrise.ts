@@ -32,9 +32,11 @@ const executesunriseCommand = async (interaction: ChatInputCommandInteraction): 
 
 		for (const day of weatherData) {
 
+			const date = new Date(day.date);
+			const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}-${date.getFullYear()}`;
 
 			const fields: any = {
-				name: day.date,
+				name: formattedDate,
 				value:
 					`
 					🌞 Sunrise ${day.sunriseTime}\n
@@ -44,12 +46,7 @@ const executesunriseCommand = async (interaction: ChatInputCommandInteraction): 
 
 			embed.addFields(fields);
 		}
-
-		await interaction.editReply({
-			embeds: [
-				embed,
-			],
-		} as any);
+			await interaction.editReply({ embeds: [embed] } as any);
 	} catch (error: Error) {
 		await interaction.editReply(error.message);
 		throw new Error(`Error fetching forecast for ${locationName}`);
