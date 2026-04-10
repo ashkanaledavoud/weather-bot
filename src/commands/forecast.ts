@@ -38,9 +38,11 @@ const executeForecastCommand = async (interaction: ChatInputCommandInteraction):
 			const maxTemp = isImperial ? day.tempMaxF : day.tempMaxC;
 			const avgTemp = isImperial ? day.tempAvgF : day.tempAvgC;
 
-			const date = new Date(day.date);
-			const formattedDate = `${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-${date.getUTCDate().toString().padStart(2, '0')}-${date.getUTCFullYear()}`;
-			const conditionIconUrl = day.conditionIcon.startsWith('//') ? `https:${day.conditionIcon}` : day.conditionIcon;
+        const date = day.date;
+        const splitDateTime = date.split(/[- ]/);
+        const formattedDate = splitDateTime[1] + "-" + splitDateTime[2] + "-" + splitDateTime[0];
+		
+		const conditionIconUrl = day.conditionIcon.startsWith('//') ? `https:${day.conditionIcon}` : day.conditionIcon;
 
 			const fields: any = {
 				name: formattedDate,

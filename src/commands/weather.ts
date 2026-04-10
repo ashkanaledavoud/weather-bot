@@ -35,12 +35,14 @@ const executeWeatherCommand = async (interaction: ChatInputCommandInteraction): 
         const currWind = isImperial ? weatherData.windMph : weatherData.windKph;
         const windUnit = isImperial ? 'mph' : 'kph';
 
-        const date = new Date(weatherData.localtime);
-        const formattedTime = `${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-${date.getUTCDate().toString().padStart(2, '0')}-${date.getUTCFullYear()} ${(date.getUTCHours()).toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}`;
+        const dateTime = weatherData.localtime;
+        const splitDateTime = dateTime.split(/[- ]/);
+        const formattedDateTime = splitDateTime[1] + "-" + splitDateTime[2] + "-" + splitDateTime[0] + " " + splitDateTime[3];
+        
         const conditionIconUrl = weatherData.conditionIcon.startsWith('//') ? `https:${weatherData.conditionIcon}` : weatherData.conditionIcon;
 
         const fields: any = {
-            name: formattedTime,
+            name: formattedDateTime,
             value: 
             `
                 Condition: ${weatherData.conditionText}\n
